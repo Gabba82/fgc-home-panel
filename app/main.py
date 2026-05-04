@@ -5,9 +5,10 @@ from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
+from .amb_client import AMBClient
 from .config import get_settings
 from .fgc_client import FGCClient
-from .models import HealthResponse, NextTrainsResponse, RouteSense
+from .models import BusStopResponse, HealthResponse, NextTrainsResponse, RouteSense
 from .services import FGCService, now_local
 
 settings = get_settings()
@@ -21,13 +22,16 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     client = FGCClient(settings)
+    amb_client = AMBClient(settings)
     app.state.fgc_client = client
+    app.state.amb_client = amb_client
     app.state.fgc_service = FGCService(client, settings)
     logger.info("FGC Home Panel started timezone=%s cache_ttl=%ss", settings.timezone, settings.cache_ttl_seconds)
     try:
         yield
     finally:
         await client.close()
+        await amb_client.close()
 
 
 app = FastAPI(title="FGC Home Panel", version="1.0.0", lifespan=lifespan)
@@ -60,6 +64,15 @@ async def next_trains(
 @app.get("/api/alerts")
 async def alerts():
     return {"updated_at": now_local(settings).isoformat(), "alerts": await app.state.fgc_service.alerts()}
+
+
+@app.get("/api/bus-stop", response_model=BusStopResponse)
+async def bus_stop(stop_id: str = Query(default=settings.bus_stop_id, pattern=r"^\d+$")) -> BusStopResponse:
+    try:
+        return await app.state.amb_client.stop_arrivals(stop_id)
+    except Exception as exc:
+        logger.exception("Could not read AMB bus stop %s", stop_id)
+        raise HTTPException(status_code=503, detail="No se han podido consultar los autobuses de AMB") from exc
 
 
 @app.get("/api/health", response_model=HealthResponse)
