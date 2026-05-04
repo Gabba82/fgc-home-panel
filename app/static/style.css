@@ -148,6 +148,10 @@ h2 {
   padding: 12px;
 }
 
+.train.bus {
+  min-height: 92px;
+}
+
 .line-badge {
   display: grid;
   place-items: center;
@@ -255,5 +259,11 @@ h2 {
 
   .route-card {
     padding: 20px;
+  }
+}
+
+@media (min-width: 1050px) {
+  .cards {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
