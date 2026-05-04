@@ -141,6 +141,20 @@ function renderBusStop(data) {
   data.arrivals.forEach((bus) => arrivals.appendChild(busElement(bus)));
 }
 
+function renderBusError(message) {
+  const card = document.querySelector("[data-bus-stop]");
+  const meta = card.querySelector(".meta");
+  const arrivals = card.querySelector(".bus-arrivals");
+
+  meta.textContent = `No se han podido actualizar los buses Â· ${formatUpdatedAt(new Date().toISOString())}`;
+  arrivals.innerHTML = "";
+
+  const empty = document.createElement("div");
+  empty.className = "empty";
+  empty.textContent = message || "AMB no responde ahora mismo.";
+  arrivals.appendChild(empty);
+}
+
 async function loadSense(sense) {
   const response = await fetch(`/api/next-trains?sense=${encodeURIComponent(sense)}`, {
     headers: { Accept: "application/json" }
@@ -164,16 +178,31 @@ async function loadBusStop() {
 async function refresh() {
   refreshButton.disabled = true;
   globalError.classList.add("hidden");
-  try {
-    const [busStop, ...results] = await Promise.all([loadBusStop(), ...senses.map((sense) => loadSense(sense))]);
-    renderBusStop(busStop);
-    results.forEach((data) => renderCard(data.sense, data));
-  } catch (error) {
-    globalError.textContent = `No se han podido actualizar los datos. ${error.message}`;
-    globalError.classList.remove("hidden");
-  } finally {
-    refreshButton.disabled = false;
+  const [busStopResult, ...trainResults] = await Promise.allSettled([
+    loadBusStop(),
+    ...senses.map((sense) => loadSense(sense))
+  ]);
+
+  if (busStopResult.status === "fulfilled") {
+    renderBusStop(busStopResult.value);
+  } else {
+    renderBusError(busStopResult.reason?.message);
   }
+
+  const failedTrains = [];
+  trainResults.forEach((result) => {
+    if (result.status === "fulfilled") {
+      renderCard(result.value.sense, result.value);
+    } else {
+      failedTrains.push(result.reason?.message || "FGC no responde");
+    }
+  });
+
+  if (failedTrains.length) {
+    globalError.textContent = `No se han podido actualizar algunos trenes. ${failedTrains.join(" ")}`;
+    globalError.classList.remove("hidden");
+  }
+  refreshButton.disabled = false;
 }
 
 refreshButton.addEventListener("click", refresh);
