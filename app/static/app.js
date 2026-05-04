@@ -11,7 +11,7 @@ const statusLabels = {
 };
 
 function formatUpdatedAt(value) {
-  if (!value) return "Sin actualización";
+  if (!value) return "Sin actualizaciÃ³n";
   return new Intl.DateTimeFormat("es-ES", {
     hour: "2-digit",
     minute: "2-digit",
@@ -63,9 +63,36 @@ function trainElement(train) {
     </div>
     <p class="train-sub">
       <span>${train.headsign || "Destino no informado"}</span>
-      ${train.platform ? `<span class="platform">Andén ${train.platform}</span>` : ""}
+      ${train.platform ? `<span class="platform">AndÃ©n ${train.platform}</span>` : ""}
     </p>
     <div class="status ${train.status}">${statusText(train)}</div>
+  `;
+
+  element.append(badge, main);
+  return element;
+}
+
+function busElement(bus) {
+  const element = document.createElement("div");
+  element.className = "train bus";
+
+  const badge = document.createElement("div");
+  badge.className = "line-badge";
+  badge.textContent = bus.line || "?";
+  badge.style.background = safeColor(bus.route_color, "#ffaa00");
+  badge.style.color = safeColor(bus.route_text_color, "#343434");
+
+  const main = document.createElement("div");
+  main.className = "train-main";
+  const wait = bus.minutes !== null && bus.minutes !== undefined ? `${bus.minutes} min` : bus.wait_text;
+  main.innerHTML = `
+    <div class="times">
+      <span class="time">${wait || "--"}</span>
+      ${bus.scheduled_time ? `<span class="arrival">prog. ${bus.scheduled_time}</span>` : ""}
+    </div>
+    <p class="train-sub">
+      <span>${bus.destination || "Destino no informado"}</span>
+    </p>
   `;
 
   element.append(badge, main);
@@ -85,12 +112,33 @@ function renderCard(sense, data) {
   if (!data.trains?.length) {
     const empty = document.createElement("div");
     empty.className = "empty";
-    empty.textContent = "No se han encontrado próximos trenes con la información disponible.";
+    empty.textContent = "No se han encontrado prÃ³ximos trenes con la informaciÃ³n disponible.";
     trains.appendChild(empty);
     return;
   }
 
   data.trains.forEach((train) => trains.appendChild(trainElement(train)));
+}
+
+function renderBusStop(data) {
+  const card = document.querySelector(`[data-bus-stop="${data.stop_id}"]`);
+  const direction = card.querySelector(".direction");
+  const meta = card.querySelector(".meta");
+  const arrivals = card.querySelector(".bus-arrivals");
+
+  direction.textContent = data.stop_name ? `Parada ${data.stop_id}` : `Parada ${data.stop_id}`;
+  meta.textContent = `${data.stop_name || "Bus AMB"} Â· Actualizado a las ${formatUpdatedAt(data.updated_at)}`;
+  arrivals.innerHTML = "";
+
+  if (!data.arrivals?.length) {
+    const empty = document.createElement("div");
+    empty.className = "empty";
+    empty.textContent = "No se han encontrado prÃ³ximos buses con la informaciÃ³n disponible.";
+    arrivals.appendChild(empty);
+    return;
+  }
+
+  data.arrivals.forEach((bus) => arrivals.appendChild(busElement(bus)));
 }
 
 async function loadSense(sense) {
@@ -103,11 +151,22 @@ async function loadSense(sense) {
   return response.json();
 }
 
+async function loadBusStop() {
+  const response = await fetch("/api/bus-stop", {
+    headers: { Accept: "application/json" }
+  });
+  if (!response.ok) {
+    throw new Error(`AMB no responde correctamente (${response.status})`);
+  }
+  return response.json();
+}
+
 async function refresh() {
   refreshButton.disabled = true;
   globalError.classList.add("hidden");
   try {
-    const results = await Promise.all(senses.map((sense) => loadSense(sense)));
+    const [busStop, ...results] = await Promise.all([loadBusStop(), ...senses.map((sense) => loadSense(sense))]);
+    renderBusStop(busStop);
     results.forEach((data) => renderCard(data.sense, data));
   } catch (error) {
     globalError.textContent = `No se han podido actualizar los datos. ${error.message}`;
