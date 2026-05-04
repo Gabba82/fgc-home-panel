@@ -47,6 +47,23 @@ class NextTrainsResponse(BaseModel):
     alerts: list[Alert] = Field(default_factory=list)
 
 
+class BusArrival(BaseModel):
+    line: str
+    destination: str | None = None
+    wait_text: str
+    minutes: int | None = None
+    scheduled_time: str | None = None
+    route_color: str | None = None
+    route_text_color: str | None = None
+
+
+class BusStopResponse(BaseModel):
+    stop_id: str
+    stop_name: str | None = None
+    updated_at: str
+    arrivals: list[BusArrival]
+
+
 class HealthResponse(BaseModel):
     status: Literal["ok", "degraded"]
     fgc_api: Literal["ok", "error"]
