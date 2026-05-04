@@ -1,7 +1,7 @@
 import logging
 import re
 import time
-from datetime import datetime
+from datetime import datetime, time as datetime_time, timedelta
 from html import unescape
 from html.parser import HTMLParser
 from typing import Any
@@ -89,7 +89,7 @@ class AMBStopParser(HTMLParser):
         current = self.rows.setdefault(row_id, {}).get(field, "")
         self.rows[row_id][field] = self._clean(f"{current} {data}")
 
-    def arrivals(self, limit: int) -> list[BusArrival]:
+    def arrivals(self, limit: int, settings: Settings) -> list[BusArrival]:
         arrivals: list[BusArrival] = []
         for row_id in sorted(self.rows):
             row = self.rows[row_id]
@@ -111,9 +111,28 @@ class AMBStopParser(HTMLParser):
                     route_text_color=row.get("route_text_color"),
                 )
             )
-            if len(arrivals) >= limit:
-                break
-        return arrivals
+        arrivals.sort(key=lambda arrival: self._sort_key(arrival, settings))
+        return arrivals[:limit]
+
+    def _sort_key(self, arrival: BusArrival, settings: Settings) -> tuple[int, float]:
+        if arrival.minutes is not None:
+            return (0, arrival.minutes)
+        if arrival.scheduled_time:
+            parsed_time = self._parse_scheduled_time(arrival.scheduled_time)
+            if parsed_time:
+                current = datetime.now(settings.tzinfo)
+                scheduled = datetime.combine(current.date(), parsed_time, tzinfo=settings.tzinfo)
+                if scheduled < current:
+                    scheduled += timedelta(days=1)
+                return (1, scheduled.timestamp())
+        return (2, float("inf"))
+
+    def _parse_scheduled_time(self, value: str) -> datetime_time | None:
+        try:
+            hour, minute = [int(part) for part in value.split(":", maxsplit=1)]
+        except ValueError:
+            return None
+        return datetime_time(hour % 24, minute)
 
     def _row_id(self, element_id: str) -> str | None:
         match = re.search(r"rLineasConParada_(ctl\d+)_", element_id)
@@ -177,7 +196,11 @@ class AMBClient:
         response.raise_for_status()
         data = response.json()
         arrivals = []
-        for item in data.get("data", {}).get("ibus", [])[: self.settings.bus_arrivals_limit]:
+        ibus = sorted(
+            data.get("data", {}).get("ibus", []),
+            key=lambda item: (item.get("t-in-s") is None, item.get("t-in-s") or item.get("t-in-min") or float("inf")),
+        )
+        for item in ibus[: self.settings.bus_arrivals_limit]:
             minutes = item.get("t-in-min")
             wait_text = item.get("text-ca") or item.get("text") or (f"{minutes} min" if minutes is not None else "")
             arrivals.append(
@@ -209,6 +232,6 @@ class AMBClient:
             stop_id=stop_id,
             stop_name=parser.stop_name,
             updated_at=datetime.now(self.settings.tzinfo).isoformat(),
-            arrivals=parser.arrivals(self.settings.bus_arrivals_limit),
+            arrivals=parser.arrivals(self.settings.bus_arrivals_limit, self.settings),
         )
         return result
