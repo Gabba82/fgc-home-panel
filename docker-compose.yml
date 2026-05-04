@@ -1,0 +1,13 @@
+services:
+  fgc-home-panel:
+    build: .
+    container_name: fgc-home-panelius
+    restart: unless-stopped
+    environment:
+      FGC_TIMEZONE: ${FGC_TIMEZONE:-Europe/Madrid}
+      FGC_CACHE_TTL_SECONDS: ${FGC_CACHE_TTL_SECONDS:-30}
+      FGC_HTTP_TIMEOUT_SECONDS: ${FGC_HTTP_TIMEOUT_SECONDS:-8}
+      FGC_API_BASE_URL: ${FGC_API_BASE_URL:-https://dadesobertes.fgc.cat/api/explore/v2.1/catalog/datasets}
+      FGC_LOG_LEVEL: ${FGC_LOG_LEVEL:-INFO}
+    ports:
+      - "${FGC_EXTERNAL_PORT:-8099}:8000"

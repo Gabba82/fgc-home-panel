@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="ca">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>FGC Casa</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">FGC Llobregat-Anoia</p>
+          <h1>Pròxims trens</h1>
+        </div>
+        <button id="refresh" class="refresh" type="button" aria-label="Refrescar">
+          <span>Refrescar</span>
+        </button>
+      </header>
+
+      <section id="global-error" class="global-error hidden"></section>
+
+      <section class="cards" aria-live="polite">
+        <article class="route-card" data-sense="santboi-espanya">
+          <div class="card-head">
+            <div>
+              <p class="direction">Sant Boi</p>
+              <h2>Barcelona - Plaça Espanya</h2>
+            </div>
+            <div class="pulse" title="Actualización automática cada 30 segundos"></div>
+          </div>
+          <div class="meta">Carregant...</div>
+          <div class="alerts"></div>
+          <div class="trains"></div>
+        </article>
+
+        <article class="route-card" data-sense="espanya-santboi">
+          <div class="card-head">
+            <div>
+              <p class="direction">Barcelona - Plaça Espanya</p>
+              <h2>Sant Boi</h2>
+            </div>
+            <div class="pulse" title="Actualización automática cada 30 segundos"></div>
+          </div>
+          <div class="meta">Carregant...</div>
+          <div class="alerts"></div>
+          <div class="trains"></div>
+        </article>
+      </section>
+    </main>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>
