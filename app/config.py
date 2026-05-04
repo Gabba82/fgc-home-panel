@@ -21,6 +21,12 @@ class Settings(BaseSettings):
 
     trains_limit: int = Field(default=5, ge=1, le=10)
     source_records_limit: int = Field(default=500, ge=50, le=1000)
+    bus_stop_id: str = "107214"
+    bus_stop_url: str = "https://www.ambmobilitat.cat/Principales/DatosParada.aspx"
+    amb_app_id: str = "5b1fdf3a"
+    amb_app_key: str | None = None
+    tmb_ibus_base_url: str = "https://api.tmb.cat/v1/ibus/stops"
+    bus_arrivals_limit: int = Field(default=6, ge=1, le=12)
 
     @property
     def tzinfo(self) -> ZoneInfo:
