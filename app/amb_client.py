@@ -66,7 +66,7 @@ class AMBStopParser(HTMLParser):
             self.rows[row_id].update(self._colors(attributes.get("style", "")))
         elif element_id.endswith("lblSentido"):
             self._capture = (row_id, "destination")
-        elif element_id.endswith("lblTiempo2"):
+        elif element_id.endswith("lblTiempo") or element_id.endswith("lblTiempo2"):
             self._capture = (row_id, "wait_text")
 
     def handle_endtag(self, tag: str) -> None:
