@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from datetime import datetime, time, timedelta
 from typing import Any
 
+import httpx
 from google.transit import gtfs_realtime_pb2
 
 from .config import Settings
@@ -109,14 +110,29 @@ class FGCService:
         origin_query = self._stop_query(route.origin)
         destination_query = self._stop_query(route.destination)
 
-        origin_records = await self.client.get_records(
-            self.settings.schedules_dataset,
-            where=origin_query,
-        )
-        destination_records = await self.client.get_records(
-            self.settings.schedules_dataset,
-            where=destination_query,
-        )
+        try:
+            origin_records = await self.client.get_records(
+                self.settings.schedules_dataset,
+                where=origin_query,
+            )
+            destination_records = await self.client.get_records(
+                self.settings.schedules_dataset,
+                where=destination_query,
+            )
+        except httpx.HTTPStatusError as exc:
+            if exc.response.status_code != 429:
+                raise
+            logger.warning("FGC rate limit hit for sense=%s, trying stale cached schedule data", sense)
+            origin_records = self.client.get_stale_records(
+                self.settings.schedules_dataset,
+                where=origin_query,
+            )
+            destination_records = self.client.get_stale_records(
+                self.settings.schedules_dataset,
+                where=destination_query,
+            )
+            if origin_records is None or destination_records is None:
+                raise
         realtime_updates = await self._safe_realtime_updates()
         alerts = await self.alerts()
 
