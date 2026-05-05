@@ -1,7 +1,7 @@
 services:
   fgc-home-panel:
     build:
-      context: .
+      context:https://github.com/Gabba82/fgc-home-panel.git#main
       dockerfile: Dockerfile    # explícito, evita ambigüedad
     image: fgc-home-panel:latest  # Nombre de imagen generada (útil para identificarla)
     container_name: fgc-home-panel
