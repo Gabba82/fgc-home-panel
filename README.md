@@ -129,11 +129,10 @@ Para añadir más paradas de bus:
 FGC_BUS_STOP_IDS=107214,123456,234567
 ```
 
-Para arrancar desde cero usando la imagen publicada:
+Para arrancar desde cero construyendo desde el código clonado:
 
 ```bash
-docker compose pull
-docker compose up -d
+docker compose up -d --build
 ```
 
 Comprueba el estado:
@@ -315,17 +314,16 @@ fgc-home-panel/
 
 **El panel carga pero los textos muestran caracteres extraños (`Ã©n`, `Â·`)**
 
-La versión actualizada del código corrige esto de tres maneras: el servidor declara `charset=utf-8` en la respuesta HTTP para archivos JS y CSS, el HTML incluye el atributo `charset="utf-8"` en el tag `<script>`, y Python fuerza la decodificación UTF-8 al leer la API de FGC. Si tras actualizar sigues viendo el problema, descarga la imagen actualizada:
+La versión actualizada del código corrige esto de tres maneras: el servidor declara `charset=utf-8` en la respuesta HTTP para archivos JS y CSS, el HTML incluye el atributo `charset="utf-8"` en el tag `<script>`, y Python fuerza la decodificación UTF-8 al leer la API de FGC. Si tras actualizar sigues viendo el problema, reconstruye la imagen:
 
 ```bash
 docker compose down
-docker compose pull
-docker compose up -d
+docker compose up -d --build
 ```
 
 **El gestor de aplicaciones muestra "pendiente de reconstruir"**
 
-La instalación recomendada usa `ghcr.io/gabba82/fgc-home-panel:latest` y no necesita `build`. Si todavía aparece como pendiente, borra la app antigua y reinstala con la sección [Reinstalación limpia](#reinstalación-limpia).
+Este proyecto se construye desde el código clonado con `build: .`. Algunos gestores lo muestran como pendiente hasta que ejecutas la reconstrucción. Ejecuta `docker compose up -d --build`; si sigue apareciendo como app antigua, borra la app anterior y reinstala con la sección [Reinstalación limpia](#reinstalación-limpia).
 
 **El panel muestra "No se han podido actualizar los datos"**
 

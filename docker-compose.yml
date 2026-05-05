@@ -1,6 +1,7 @@
 services:
   fgc-home-panel:
-    image: ghcr.io/gabba82/fgc-home-panel:latest
+    build: .
+    image: fgc-home-panel:latest
     container_name: fgc-home-panel
     restart: unless-stopped
     env_file:
