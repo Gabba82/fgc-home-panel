@@ -2,7 +2,8 @@ name: fgc-home-panel
 
 services:
   fgc-home-panel:
-    build: .
+    build:
+      context: https://github.com/Gabba82/fgc-home-panel.git#main
     image: fgc-home-panel:latest
     container_name: fgc-home-panel
     restart: unless-stopped
@@ -19,7 +20,7 @@ services:
       FGC_AMB_APP_KEY: ${FGC_AMB_APP_KEY:-}
       FGC_BUS_STOP_ID: ${FGC_BUS_STOP_ID:-}
     ports:
-      - "${FGC_EXTERNAL_PORT:-8099}:8000"
+      - "${WEBUI_PORT:-8099}:8000"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health', timeout=5)\""]
       interval: 30s
@@ -66,7 +67,7 @@ x-casaos:
   hostname: ""
   icon: https://raw.githubusercontent.com/Gabba82/fgc-home-panel/main/docs/icon.svg
   index: /
-  port_map: "8099"
+  port_map: ${WEBUI_PORT:-8099}
   scheme: http
   store_app_id: fgc-home-panel
   title:

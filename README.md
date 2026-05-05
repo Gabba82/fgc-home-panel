@@ -15,6 +15,7 @@ Pensado para una pantalla de casa, tablet, móvil o navegador siempre abierto. M
 - [Captura](#captura)
 - [Requisitos](#requisitos)
 - [Instalación](#instalación)
+- [Instalación en CasaOS](#instalación-en-casaos)
 - [Reinstalación limpia](#reinstalación-limpia)
 - [Uso](#uso)
 - [Configuración](#configuración)
@@ -79,6 +80,22 @@ Si lo ejecutas en un servidor o Raspberry Pi, cambia `localhost` por la IP del e
 ```text
 http://IP_DEL_SERVIDOR:8099
 ```
+
+## Instalación en CasaOS
+
+Para que CasaOS lo reconozca como aplicación gestionable, instálalo desde la interfaz de CasaOS importando `casaos-compose.yml`. Ese archivo incluye metadatos `x-casaos` con icono, título, puerto web y variables editables.
+
+Pasos recomendados:
+
+1. Abre CasaOS.
+2. Entra en App Store.
+3. Pulsa instalación personalizada o importar compose.
+4. Pega el contenido de `casaos-compose.yml` del repositorio.
+5. Revisa el puerto web `8099` si ya lo usa otra app.
+6. Deja `FGC_BUS_STOP_IDS` vacío si no quieres buses.
+7. Instala la app.
+
+Si la instalas por SSH con `docker compose up`, CasaOS puede mostrarla como aplicación antigua o contenedor externo. Para que salga como una app más, haz la importación desde CasaOS.
 
 ## Reinstalación limpia
 
@@ -304,6 +321,9 @@ fgc-home-panel/
 |   |-- models.py
 |   `-- services.py
 |-- .env.example
+|-- docs/
+|   `-- icon.svg
+|-- casaos-compose.yml
 |-- docker-compose.yml
 |-- Dockerfile
 |-- requirements.txt
