@@ -148,11 +148,11 @@ FGC_LOG_LEVEL=INFO
 | `FGC_HTTP_TIMEOUT_SECONDS` | `8` | Timeout HTTP al consultar FGC. |
 | `FGC_API_BASE_URL` | API de Dades Obertes FGC | URL base de la API de FGC. |
 | `FGC_LOG_LEVEL` | `INFO` | Nivel de logs. |
-| `FGC_AMB_APP_ID` | `5b1fdf3a` | Identificador de la aplicacion en la API TMB/AMB. |
-| `FGC_AMB_APP_KEY` | vacio | Clave privada de la API TMB/AMB. Guardala solo en `.env`. |
+| `FGC_AMB_APP_ID` | `5b1fdf3a` | Identificador de la aplicación en la API TMB/AMB. |
+| `FGC_AMB_APP_KEY` | vacío | Clave privada de la API TMB/AMB. Guárdala solo en `.env`. |
 | `FGC_BUS_STOP_ID` | `107214` | Parada AMB que se muestra en el panel. |
 | `FGC_BUS_STOP_URL` | Web AMB Mobilitat | URL de la ficha de parada AMB. |
-| `FGC_BUS_ARRIVALS_LIMIT` | `6` | NÃºmero mÃ¡ximo de llegadas de bus a mostrar. |
+| `FGC_BUS_ARRIVALS_LIMIT` | `6` | Número máximo de llegadas de bus a mostrar. |
 
 ## API
 
@@ -163,7 +163,7 @@ FGC_LOG_LEVEL=INFO
 | `GET /api/next-trains?sense=santboi-espanya` | Próximos trenes Sant Boi -> Plaça Espanya. |
 | `GET /api/next-trains?sense=espanya-santboi` | Próximos trenes Plaça Espanya -> Sant Boi. |
 | `GET /api/alerts` | Alertas relevantes. |
-| `GET /api/bus-stop?stop_id=107214` | PrÃ³ximos autobuses de una parada AMB. |
+| `GET /api/bus-stop?stop_id=107214` | Próximos autobuses de una parada AMB. |
 | `GET /api/health` | Estado de la app y conectividad con FGC. |
 
 ## Fuentes de datos

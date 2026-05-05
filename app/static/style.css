@@ -25,9 +25,9 @@ body {
 }
 
 .shell {
-  width: min(1180px, 100%);
+  width: min(1480px, 100%);
   margin: 0 auto;
-  padding: 24px 14px 40px;
+  padding: 20px 12px 32px;
 }
 
 .topbar {
@@ -63,13 +63,13 @@ p {
 
 h1 {
   margin-bottom: 0;
-  font-size: clamp(2rem, 7vw, 4.6rem);
+  font-size: clamp(2rem, 6vw, 4rem);
   line-height: 0.95;
 }
 
 h2 {
   margin-bottom: 0;
-  font-size: clamp(1.45rem, 5vw, 2.5rem);
+  font-size: clamp(1.35rem, 4vw, 2.35rem);
   line-height: 1;
 }
 
@@ -181,7 +181,7 @@ h2 {
 }
 
 .time {
-  font-size: clamp(1.75rem, 8vw, 3.1rem);
+  font-size: clamp(1.75rem, 7vw, 3rem);
   font-weight: 900;
   line-height: 1;
 }
@@ -253,9 +253,9 @@ h2 {
   display: none;
 }
 
-@media (min-width: 820px) {
+@media (min-width: 700px) {
   .shell {
-    padding: 34px 24px 48px;
+    padding: 28px 20px 40px;
   }
 
   .cards {
@@ -268,8 +268,103 @@ h2 {
   }
 }
 
-@media (min-width: 1050px) {
+@media (min-width: 900px) {
   .cards {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1200px) {
+  .topbar {
+    margin-bottom: 14px;
+  }
+
+  h1 {
+    font-size: clamp(3rem, 4.5vw, 4.2rem);
+  }
+
+  h2 {
+    font-size: clamp(1.75rem, 2.4vw, 2.35rem);
+  }
+
+  .route-card {
+    padding: 18px;
+  }
+
+  .meta {
+    margin: 12px 0;
+  }
+
+  .trains {
+    gap: 8px;
+  }
+
+  .train {
+    grid-template-columns: 68px 1fr;
+    gap: 10px;
+    min-height: 92px;
+    padding: 10px;
+  }
+
+  .train.bus {
+    min-height: 82px;
+  }
+
+  .line-badge {
+    width: 56px;
+    height: 56px;
+    font-size: 1.15rem;
+  }
+
+  .time {
+    font-size: clamp(2rem, 3.3vw, 2.85rem);
+  }
+
+  .status {
+    min-height: 28px;
+    margin-top: 8px;
+    padding: 4px 8px;
+  }
+}
+
+@media (min-width: 1600px) {
+  .shell {
+    padding-top: 24px;
+  }
+
+  .cards {
+    gap: 16px;
+  }
+
+  h1 {
+    font-size: 4.1rem;
+  }
+
+  h2 {
+    font-size: 2.25rem;
+  }
+}
+
+@media (max-width: 520px) {
+  .topbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .refresh {
+    width: 100%;
+  }
+
+  .train {
+    grid-template-columns: 56px 1fr;
+    gap: 10px;
+    min-height: 88px;
+    padding: 10px;
+  }
+
+  .line-badge {
+    width: 52px;
+    height: 52px;
+    font-size: 1.05rem;
   }
 }
