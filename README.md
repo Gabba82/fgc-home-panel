@@ -188,6 +188,72 @@ Otro ejemplo:
 FGC_TRAIN_ROUTES=Martorell Central|Barcelona - Plaça Espanya;Barcelona - Plaça Espanya|Martorell Central
 ```
 
+Ejemplo con tus paradas actuales y una parada AMB:
+
+```env
+FGC_TRAIN_ROUTES=Sant Boi|Barcelona - Plaça Espanya;Barcelona - Plaça Espanya|Sant Boi
+FGC_BUS_STOP_IDS=107214
+```
+
+Ejemplos de nombres de estaciones FGC que puedes usar en `FGC_TRAIN_ROUTES`:
+
+```text
+Barcelona - Plaça Espanya
+Magòria La Campana
+Ildefons Cerdà
+Europa | Fira
+Gornal
+Sant Josep
+L'Hospitalet Av. Carrilet
+Almeda
+Cornellà Riera
+Sant Boi
+Molí Nou | Ciutat Cooperativa
+Colònia Güell
+Santa Coloma de Cervelló
+Sant Vicenç dels Horts
+Can Ros
+Quatre Camins
+Pallejà
+Sant Andreu de la Barca
+El Palau
+Martorell Vila | Castellbisbal
+Martorell Central
+Martorell Enllaç
+Abrera
+Olesa de Montserrat
+Aeri de Montserrat
+Monistrol de Montserrat
+Castellbell i el Vilar
+Sant Vicenç | Castellgalí
+Manresa Viladordis
+Manresa Alta
+Manresa Baixador
+Sant Esteve Sesrovires
+La Beguda
+Can Parellada
+Masquefa
+Piera
+Vallbona d'Anoia
+Capellades
+La Pobla de Claramunt
+Vilanova del Camí
+Igualada
+```
+
+Más ejemplos de rutas:
+
+```env
+FGC_TRAIN_ROUTES=Sant Boi|Barcelona - Plaça Espanya;Barcelona - Plaça Espanya|Sant Boi
+FGC_TRAIN_ROUTES=Sant Vicenç dels Horts|Barcelona - Plaça Espanya;Barcelona - Plaça Espanya|Sant Vicenç dels Horts
+FGC_TRAIN_ROUTES=Martorell Central|Barcelona - Plaça Espanya;Barcelona - Plaça Espanya|Martorell Central
+FGC_TRAIN_ROUTES=Olesa de Montserrat|Barcelona - Plaça Espanya;Barcelona - Plaça Espanya|Olesa de Montserrat
+FGC_TRAIN_ROUTES=Manresa Baixador|Barcelona - Plaça Espanya;Barcelona - Plaça Espanya|Manresa Baixador
+FGC_TRAIN_ROUTES=Igualada|Barcelona - Plaça Espanya;Barcelona - Plaça Espanya|Igualada
+```
+
+En `.env` solo debe quedar una línea `FGC_TRAIN_ROUTES`. Copia el ejemplo que quieras y edítalo.
+
 Estados posibles:
 
 | Estado | Significado |
