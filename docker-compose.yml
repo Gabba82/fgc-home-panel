@@ -1,7 +1,10 @@
 services:
   fgc-home-panel:
-    build: .
-    container_name: fgc-home-panelius
+    build:
+      context: .
+      dockerfile: Dockerfile    # explícito, evita ambigüedad
+    image: fgc-home-panel:latest  # Nombre de imagen generada (útil para identificarla)
+    container_name: fgc-home-panel
     restart: unless-stopped
     environment:
       FGC_TIMEZONE: ${FGC_TIMEZONE:-Europe/Madrid}
@@ -14,3 +17,19 @@ services:
       FGC_BUS_STOP_ID: ${FGC_BUS_STOP_ID:-107214}
     ports:
       - "${FGC_EXTERNAL_PORT:-8099}:8000"
+    volumes:                      # si necesitas persistir logs o config
+      - ./logs:/app/logs
+    networks:                     # red explícita (buena práctica)
+      - fgc-net
+    healthcheck:                  # para saber si el contenedor está realmente operativo
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    labels:                       # útil si usas Traefik o Portainer
+      - "com.example.description=FGC Home Panel"
+
+networks:
+  fgc-net:
+    driver: bridge
