@@ -1,3 +1,4 @@
+import json
 import logging
 import time
 from typing import Any
@@ -73,7 +74,7 @@ class FGCClient:
             page_url = f"{self.settings.api_base_url.rstrip('/')}/{dataset}/records?{'&'.join(page_params)}"
             response = await self.client.get(page_url)
             response.raise_for_status()
-            data = response.json()
+            data = json.loads(response.content.decode("utf-8"))
             page_results = data.get("results", [])
             total_count = data.get("total_count", total_count)
             results.extend(page_results)

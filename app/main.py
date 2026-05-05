@@ -1,9 +1,10 @@
 import logging
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
+from starlette.middleware.base import BaseHTTPMiddleware
 
 from .amb_client import AMBClient
 from .config import get_settings
@@ -34,7 +35,19 @@ async def lifespan(app: FastAPI):
         await amb_client.close()
 
 
+class _TextAssetsCharset(BaseHTTPMiddleware):
+    """Ensures JS and CSS static files are served with charset=utf-8."""
+
+    async def dispatch(self, request: Request, call_next):
+        response = await call_next(request)
+        ct = response.headers.get("content-type", "")
+        if ("javascript" in ct or "text/css" in ct) and "charset" not in ct:
+            response.headers["content-type"] = ct + "; charset=utf-8"
+        return response
+
+
 app = FastAPI(title="FGC Home Panel", version="1.0.0", lifespan=lifespan)
+app.add_middleware(_TextAssetsCharset)
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 

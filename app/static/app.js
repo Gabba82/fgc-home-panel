@@ -6,12 +6,12 @@ const statusLabels = {
   on_time: "En hora",
   delayed: "Retraso",
   cancelled: "Cancelado",
-  unknown_realtime: "Sin datos realtime",
+  unknown_realtime: "Sin datos en tiempo real",
   service_alert: "Incidencia"
 };
 
 function formatUpdatedAt(value) {
-  if (!value) return "Sin actualizaciÃ³n";
+  if (!value) return "Sin actualización";
   return new Intl.DateTimeFormat("es-ES", {
     hour: "2-digit",
     minute: "2-digit",
@@ -63,7 +63,7 @@ function trainElement(train) {
     </div>
     <p class="train-sub">
       <span>${train.headsign || "Destino no informado"}</span>
-      ${train.platform ? `<span class="platform">AndÃ©n ${train.platform}</span>` : ""}
+      ${train.platform ? `<span class="platform">Andén ${train.platform}</span>` : ""}
     </p>
     <div class="status ${train.status}">${statusText(train)}</div>
   `;
@@ -112,7 +112,7 @@ function renderCard(sense, data) {
   if (!data.trains?.length) {
     const empty = document.createElement("div");
     empty.className = "empty";
-    empty.textContent = "No se han encontrado prÃ³ximos trenes con la informaciÃ³n disponible.";
+    empty.textContent = "No se han encontrado próximos trenes con la información disponible.";
     trains.appendChild(empty);
     return;
   }
@@ -126,14 +126,14 @@ function renderBusStop(data) {
   const meta = card.querySelector(".meta");
   const arrivals = card.querySelector(".bus-arrivals");
 
-  direction.textContent = data.stop_name ? `Parada ${data.stop_id}` : `Parada ${data.stop_id}`;
-  meta.textContent = `${data.stop_name || "Bus AMB"} Â· Actualizado a las ${formatUpdatedAt(data.updated_at)}`;
+  direction.textContent = `Parada ${data.stop_id}`;
+  meta.textContent = `${data.stop_name || "Bus AMB"} · Actualizado a las ${formatUpdatedAt(data.updated_at)}`;
   arrivals.innerHTML = "";
 
   if (!data.arrivals?.length) {
     const empty = document.createElement("div");
     empty.className = "empty";
-    empty.textContent = "No se han encontrado prÃ³ximos buses con la informaciÃ³n disponible.";
+    empty.textContent = "No se han encontrado próximos buses con la información disponible.";
     arrivals.appendChild(empty);
     return;
   }
@@ -146,7 +146,7 @@ function renderBusError(message) {
   const meta = card.querySelector(".meta");
   const arrivals = card.querySelector(".bus-arrivals");
 
-  meta.textContent = `No se han podido actualizar los buses Â· ${formatUpdatedAt(new Date().toISOString())}`;
+  meta.textContent = `No se han podido actualizar los buses · ${formatUpdatedAt(new Date().toISOString())}`;
   arrivals.innerHTML = "";
 
   const empty = document.createElement("div");
@@ -206,5 +206,12 @@ async function refresh() {
 }
 
 refreshButton.addEventListener("click", refresh);
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "r" && !event.ctrlKey && !event.metaKey && !event.altKey && document.activeElement === document.body) {
+    refresh();
+  }
+});
+
 refresh();
 setInterval(refresh, 30000);

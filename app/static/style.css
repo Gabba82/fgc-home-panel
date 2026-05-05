@@ -146,6 +146,12 @@ h2 {
   border-radius: 8px;
   background: var(--panel-soft);
   padding: 12px;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.train:hover {
+  border-color: #4b5563;
+  background: #252930;
 }
 
 .train.bus {
