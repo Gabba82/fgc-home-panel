@@ -15,6 +15,7 @@ Pensado para una pantalla de casa, tablet, móvil o navegador siempre abierto. M
 - [Captura](#captura)
 - [Requisitos](#requisitos)
 - [Instalación](#instalación)
+- [Reinstalación limpia](#reinstalación-limpia)
 - [Uso](#uso)
 - [Configuración](#configuración)
 - [API](#api)
@@ -79,14 +80,78 @@ Si lo ejecutas en un servidor o Raspberry Pi, cambia `localhost` por la IP del e
 http://IP_DEL_SERVIDOR:8099
 ```
 
+## Reinstalación limpia
+
+Estos pasos eliminan el contenedor, la imagen local y la carpeta anterior antes de desplegar de nuevo desde GitHub.
+
+Para el ejemplo se usa esta ruta:
+
+```bash
+/DATA/AppData/Ferrocarrils/fgc-home-panel
+```
+
+Para parar y borrar la instalación anterior:
+
+```bash
+cd /DATA/AppData/Ferrocarrils/fgc-home-panel
+docker compose down --rmi local --remove-orphans
+cd ..
+rm -rf fgc-home-panel
+```
+
+Para clonar la versión actual del repositorio:
+
+```bash
+git clone https://github.com/Gabba82/fgc-home-panel.git
+cd fgc-home-panel
+```
+
+Para crear la configuración:
+
+```bash
+cp .env.example .env
+nano .env
+```
+
+Ejemplo de `.env` mínimo:
+
+```env
+FGC_EXTERNAL_PORT=8099
+FGC_TIMEZONE=Europe/Madrid
+FGC_PANEL_TITLE=Pròxims trens
+FGC_PANEL_SUBTITLE=
+FGC_BUS_STOP_IDS=107214
+```
+
+Para añadir más paradas de bus:
+
+```env
+FGC_BUS_STOP_IDS=107214,123456,234567
+```
+
+Para arrancar desde cero:
+
+```bash
+docker compose build --no-cache
+docker compose up -d
+```
+
+Comprueba el estado:
+
+```bash
+docker compose ps
+docker compose logs -f
+```
+
 ## Uso
 
-El panel muestra dos tarjetas:
+El panel muestra tarjetas para:
 
 - `Sant Boi -> Barcelona - Plaça Espanya`
 - `Barcelona - Plaça Espanya -> Sant Boi`
+- Cada parada AMB configurada en `FGC_BUS_STOP_IDS`
 
-Cada tren muestra la línea, hora de salida, hora de llegada, destino del tren, andén si está disponible y estado del servicio.
+Cada tren muestra la línea, hora de salida, hora de llegada, destino del tren, andén si está disponible y estado del servicio. Cada tarjeta de bus muestra línea, tiempo de espera y destino.
 
 Estados posibles:
 
@@ -138,6 +203,8 @@ FGC_TIMEZONE=Europe/Madrid
 FGC_CACHE_TTL_SECONDS=30
 FGC_HTTP_TIMEOUT_SECONDS=8
 FGC_LOG_LEVEL=INFO
+FGC_PANEL_TITLE=Pròxims trens
+FGC_PANEL_SUBTITLE=
 FGC_BUS_STOP_IDS=107214
 ```
 
@@ -155,6 +222,8 @@ FGC_BUS_STOP_IDS=107214,123456,234567
 | `FGC_HTTP_TIMEOUT_SECONDS` | `8` | Timeout HTTP al consultar FGC. |
 | `FGC_API_BASE_URL` | API de Dades Obertes FGC | URL base de la API de FGC. |
 | `FGC_LOG_LEVEL` | `INFO` | Nivel de logs. |
+| `FGC_PANEL_TITLE` | `Pròxims trens` | Título principal del panel. |
+| `FGC_PANEL_SUBTITLE` | vacío | Línea superior opcional. Si está vacía, no se muestra. |
 | `FGC_AMB_APP_ID` | `5b1fdf3a` | Identificador de la aplicación en la API TMB/AMB. |
 | `FGC_AMB_APP_KEY` | vacío | Clave privada de la API TMB/AMB. Guárdala solo en `.env`. |
 | `FGC_BUS_STOP_IDS` | `107214` | Paradas AMB que se muestran en el panel, separadas por comas. |
@@ -167,6 +236,7 @@ FGC_BUS_STOP_IDS=107214,123456,234567
 | Endpoint | Descripción |
 | --- | --- |
 | `GET /` | Interfaz web. |
+| `GET /api/panel-config` | Textos configurados para el encabezado del panel. |
 | `GET /api/routes` | Sentidos configurados. |
 | `GET /api/next-trains?sense=santboi-espanya` | Próximos trenes Sant Boi -> Plaça Espanya. |
 | `GET /api/next-trains?sense=espanya-santboi` | Próximos trenes Plaça Espanya -> Sant Boi. |
@@ -228,11 +298,13 @@ fgc-home-panel/
 |   |   |-- app.js
 |   |   |-- index.html
 |   |   `-- style.css
+|   |-- amb_client.py
 |   |-- config.py
 |   |-- fgc_client.py
 |   |-- main.py
 |   |-- models.py
 |   `-- services.py
+|-- .env.example
 |-- docker-compose.yml
 |-- Dockerfile
 |-- requirements.txt

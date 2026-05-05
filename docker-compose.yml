@@ -14,6 +14,8 @@ services:
       FGC_HTTP_TIMEOUT_SECONDS: ${FGC_HTTP_TIMEOUT_SECONDS:-8}
       FGC_API_BASE_URL: ${FGC_API_BASE_URL:-https://dadesobertes.fgc.cat/api/explore/v2.1/catalog/datasets}
       FGC_LOG_LEVEL: ${FGC_LOG_LEVEL:-INFO}
+      FGC_PANEL_TITLE: ${FGC_PANEL_TITLE:-Pròxims trens}
+      FGC_PANEL_SUBTITLE: ${FGC_PANEL_SUBTITLE:-}
       FGC_BUS_STOP_IDS: ${FGC_BUS_STOP_IDS:-}
       FGC_AMB_APP_ID: ${FGC_AMB_APP_ID:-5b1fdf3a}
       FGC_AMB_APP_KEY: ${FGC_AMB_APP_KEY:-}

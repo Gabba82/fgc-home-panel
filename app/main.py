@@ -61,6 +61,11 @@ async def routes() -> list[RouteSense]:
     return app.state.fgc_service.routes()
 
 
+@app.get("/api/panel-config")
+async def panel_config():
+    return {"title": settings.panel_title, "subtitle": settings.panel_subtitle}
+
+
 @app.get("/api/next-trains", response_model=NextTrainsResponse)
 async def next_trains(
     sense: str = Query(..., pattern="^(santboi-espanya|espanya-santboi)$"),

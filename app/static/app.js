@@ -2,6 +2,8 @@ const senses = ["santboi-espanya", "espanya-santboi"];
 const cardsContainer = document.querySelector(".cards");
 const refreshButton = document.querySelector("#refresh");
 const globalError = document.querySelector("#global-error");
+const panelTitle = document.querySelector("#panel-title");
+const panelSubtitle = document.querySelector("#panel-subtitle");
 
 const statusLabels = {
   on_time: "En hora",
@@ -30,6 +32,30 @@ function statusText(train) {
 function safeColor(value, fallback) {
   if (!value) return fallback;
   return value.startsWith("#") ? value : `#${value}`;
+}
+
+async function loadPanelConfig() {
+  const response = await fetch("/api/panel-config", {
+    headers: { Accept: "application/json" }
+  });
+  if (!response.ok) return;
+
+  const config = await response.json();
+  const title = config.title?.trim();
+  const subtitle = config.subtitle?.trim();
+
+  if (title) {
+    panelTitle.textContent = title;
+    document.title = title;
+  }
+
+  if (subtitle) {
+    panelSubtitle.textContent = subtitle;
+    panelSubtitle.classList.remove("hidden");
+  } else {
+    panelSubtitle.textContent = "";
+    panelSubtitle.classList.add("hidden");
+  }
 }
 
 function renderAlerts(container, alerts) {
@@ -224,4 +250,5 @@ document.addEventListener("keydown", (event) => {
 });
 
 refresh();
+loadPanelConfig();
 setInterval(refresh, 30000);

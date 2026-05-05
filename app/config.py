@@ -13,6 +13,8 @@ class Settings(BaseSettings):
     cache_ttl_seconds: int = Field(default=30, ge=1)
     http_timeout_seconds: float = Field(default=8.0, gt=0)
     log_level: str = "INFO"
+    panel_title: str = "Pròxims trens"
+    panel_subtitle: str = ""
 
     schedules_dataset: str = "viajes-de-hoy"
     trip_updates_dataset: str = "trip-updates-gtfs_realtime"
