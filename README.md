@@ -120,7 +120,7 @@ FGC_EXTERNAL_PORT=8099
 FGC_TIMEZONE=Europe/Madrid
 FGC_PANEL_TITLE=Pròxims trens
 FGC_PANEL_SUBTITLE=
-FGC_BUS_STOP_IDS=107214
+FGC_BUS_STOP_IDS=
 ```
 
 Para añadir más paradas de bus:
@@ -129,10 +129,10 @@ Para añadir más paradas de bus:
 FGC_BUS_STOP_IDS=107214,123456,234567
 ```
 
-Para arrancar desde cero:
+Para arrancar desde cero usando la imagen publicada:
 
 ```bash
-docker compose build --no-cache
+docker compose pull
 docker compose up -d
 ```
 
@@ -205,7 +205,7 @@ FGC_HTTP_TIMEOUT_SECONDS=8
 FGC_LOG_LEVEL=INFO
 FGC_PANEL_TITLE=Pròxims trens
 FGC_PANEL_SUBTITLE=
-FGC_BUS_STOP_IDS=107214
+FGC_BUS_STOP_IDS=
 ```
 
 Para mostrar varias paradas de bus, separa los códigos con comas:
@@ -226,8 +226,8 @@ FGC_BUS_STOP_IDS=107214,123456,234567
 | `FGC_PANEL_SUBTITLE` | vacío | Línea superior opcional. Si está vacía, no se muestra. |
 | `FGC_AMB_APP_ID` | `5b1fdf3a` | Identificador de la aplicación en la API TMB/AMB. |
 | `FGC_AMB_APP_KEY` | vacío | Clave privada de la API TMB/AMB. Guárdala solo en `.env`. |
-| `FGC_BUS_STOP_IDS` | `107214` | Paradas AMB que se muestran en el panel, separadas por comas. |
-| `FGC_BUS_STOP_ID` | `107214` | Parada AMB antigua. Se usa si `FGC_BUS_STOP_IDS` no está definido. |
+| `FGC_BUS_STOP_IDS` | vacío | Paradas AMB que se muestran en el panel, separadas por comas. Si queda vacío, no se muestran buses. |
+| `FGC_BUS_STOP_ID` | vacío | Parada AMB antigua. Se usa si `FGC_BUS_STOP_IDS` no está definido. |
 | `FGC_BUS_STOP_URL` | Web AMB Mobilitat | URL de la ficha de parada AMB. |
 | `FGC_BUS_ARRIVALS_LIMIT` | `6` | Número máximo de llegadas de bus a mostrar. |
 
@@ -315,12 +315,17 @@ fgc-home-panel/
 
 **El panel carga pero los textos muestran caracteres extraños (`Ã©n`, `Â·`)**
 
-La versión actualizada del código corrige esto de tres maneras: el servidor declara `charset=utf-8` en la respuesta HTTP para archivos JS y CSS, el HTML incluye el atributo `charset="utf-8"` en el tag `<script>`, y Python fuerza la decodificación UTF-8 al leer la API de FGC. Si tras actualizar sigues viendo el problema, fuerza la reconstrucción de la imagen:
+La versión actualizada del código corrige esto de tres maneras: el servidor declara `charset=utf-8` en la respuesta HTTP para archivos JS y CSS, el HTML incluye el atributo `charset="utf-8"` en el tag `<script>`, y Python fuerza la decodificación UTF-8 al leer la API de FGC. Si tras actualizar sigues viendo el problema, descarga la imagen actualizada:
 
 ```bash
 docker compose down
-docker compose up -d --build
+docker compose pull
+docker compose up -d
 ```
+
+**El gestor de aplicaciones muestra "pendiente de reconstruir"**
+
+La instalación recomendada usa `ghcr.io/gabba82/fgc-home-panel:latest` y no necesita `build`. Si todavía aparece como pendiente, borra la app antigua y reinstala con la sección [Reinstalación limpia](#reinstalación-limpia).
 
 **El panel muestra "No se han podido actualizar los datos"**
 

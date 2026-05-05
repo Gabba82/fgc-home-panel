@@ -85,7 +85,7 @@ async def alerts():
 
 
 @app.get("/api/bus-stop", response_model=BusStopResponse)
-async def bus_stop(stop_id: str = Query(default=settings.bus_stop_id, pattern=r"^\d+$")) -> BusStopResponse:
+async def bus_stop(stop_id: str = Query(..., pattern=r"^\d+$")) -> BusStopResponse:
     try:
         return await app.state.amb_client.stop_arrivals(stop_id)
     except Exception as exc:

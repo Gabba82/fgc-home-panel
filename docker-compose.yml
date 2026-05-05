@@ -1,8 +1,6 @@
 services:
   fgc-home-panel:
-    build:
-      context: https://github.com/Gabba82/fgc-home-panel.git#main
-    image: fgc-home-panel:latest
+    image: ghcr.io/gabba82/fgc-home-panel:latest
     container_name: fgc-home-panel
     restart: unless-stopped
     env_file:
@@ -19,7 +17,7 @@ services:
       FGC_BUS_STOP_IDS: ${FGC_BUS_STOP_IDS:-}
       FGC_AMB_APP_ID: ${FGC_AMB_APP_ID:-5b1fdf3a}
       FGC_AMB_APP_KEY: ${FGC_AMB_APP_KEY:-}
-      FGC_BUS_STOP_ID: ${FGC_BUS_STOP_ID:-107214}
+      FGC_BUS_STOP_ID: ${FGC_BUS_STOP_ID:-}
     ports:
       - "${FGC_EXTERNAL_PORT:-8099}:8000"
     healthcheck:
