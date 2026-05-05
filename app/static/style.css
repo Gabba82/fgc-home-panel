@@ -10,6 +10,7 @@
   --warn: #fbbf24;
   --bad: #fb7185;
   --info: #67e8f9;
+  --card-min-width: 280px;
 }
 
 * {
@@ -270,7 +271,7 @@ h2 {
 
 @media (min-width: 900px) {
   .cards {
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(var(--card-min-width), 1fr));
   }
 }
 

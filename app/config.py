@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
     panel_title: str = "Pròxims trens"
     panel_subtitle: str = ""
+    card_min_width_px: int = Field(default=280, ge=180, le=420)
 
     schedules_dataset: str = "viajes-de-hoy"
     trip_updates_dataset: str = "trip-updates-gtfs_realtime"
@@ -23,6 +24,7 @@ class Settings(BaseSettings):
 
     trains_limit: int = Field(default=5, ge=1, le=10)
     source_records_limit: int = Field(default=500, ge=50, le=1000)
+    train_routes: str = "Sant Boi|Barcelona - Plaça Espanya;Barcelona - Plaça Espanya|Sant Boi"
     bus_stop_id: str = ""
     bus_stop_ids: str | None = None
     bus_stop_url: str = "https://www.ambmobilitat.cat/Principales/DatosParada.aspx"
@@ -40,6 +42,15 @@ class Settings(BaseSettings):
         value = self.bus_stop_ids or self.bus_stop_id
         stop_ids = [stop_id.strip() for stop_id in value.split(",") if stop_id.strip()]
         return stop_ids
+
+    @property
+    def configured_train_routes(self) -> list[tuple[str, str]]:
+        routes = []
+        for item in self.train_routes.split(";"):
+            parts = [part.strip() for part in item.split("|", maxsplit=1)]
+            if len(parts) == 2 and all(parts):
+                routes.append((parts[0], parts[1]))
+        return routes or [("Sant Boi", "Barcelona - Plaça Espanya"), ("Barcelona - Plaça Espanya", "Sant Boi")]
 
 
 @lru_cache

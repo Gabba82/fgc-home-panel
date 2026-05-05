@@ -137,6 +137,8 @@ FGC_EXTERNAL_PORT=8099
 FGC_TIMEZONE=Europe/Madrid
 FGC_PANEL_TITLE=Pròxims trens
 FGC_PANEL_SUBTITLE=
+FGC_CARD_MIN_WIDTH_PX=280
+FGC_TRAIN_ROUTES=Sant Boi|Barcelona - Plaça Espanya;Barcelona - Plaça Espanya|Sant Boi
 FGC_BUS_STOP_IDS=
 ```
 
@@ -144,6 +146,12 @@ Para añadir más paradas de bus:
 
 ```env
 FGC_BUS_STOP_IDS=107214,123456,234567
+```
+
+Si en una TV quieres que quepan cuatro tarjetas por fila, reduce el ancho mínimo:
+
+```env
+FGC_CARD_MIN_WIDTH_PX=220
 ```
 
 Para arrancar desde cero construyendo desde el código clonado:
@@ -163,11 +171,22 @@ docker compose logs -f
 
 El panel muestra tarjetas para:
 
-- `Sant Boi -> Barcelona - Plaça Espanya`
-- `Barcelona - Plaça Espanya -> Sant Boi`
+- Cada ruta FGC configurada en `FGC_TRAIN_ROUTES`.
 - Cada parada AMB configurada en `FGC_BUS_STOP_IDS`
 
 Cada tren muestra la línea, hora de salida, hora de llegada, destino del tren, andén si está disponible y estado del servicio. Cada tarjeta de bus muestra línea, tiempo de espera y destino.
+
+Las rutas FGC se configuran con pares `Origen|Destino` separados por punto y coma:
+
+```env
+FGC_TRAIN_ROUTES=Sant Boi|Barcelona - Plaça Espanya;Barcelona - Plaça Espanya|Sant Boi
+```
+
+Otro ejemplo:
+
+```env
+FGC_TRAIN_ROUTES=Martorell Central|Barcelona - Plaça Espanya;Barcelona - Plaça Espanya|Martorell Central
+```
 
 Estados posibles:
 
@@ -221,6 +240,8 @@ FGC_HTTP_TIMEOUT_SECONDS=8
 FGC_LOG_LEVEL=INFO
 FGC_PANEL_TITLE=Pròxims trens
 FGC_PANEL_SUBTITLE=
+FGC_CARD_MIN_WIDTH_PX=280
+FGC_TRAIN_ROUTES=Sant Boi|Barcelona - Plaça Espanya;Barcelona - Plaça Espanya|Sant Boi
 FGC_BUS_STOP_IDS=
 ```
 
@@ -240,6 +261,8 @@ FGC_BUS_STOP_IDS=107214,123456,234567
 | `FGC_LOG_LEVEL` | `INFO` | Nivel de logs. |
 | `FGC_PANEL_TITLE` | `Pròxims trens` | Título principal del panel. |
 | `FGC_PANEL_SUBTITLE` | vacío | Línea superior opcional. Si está vacía, no se muestra. |
+| `FGC_CARD_MIN_WIDTH_PX` | `280` | Ancho mínimo de cada tarjeta. Usa `220`-`240` para encajar más columnas en TV. |
+| `FGC_TRAIN_ROUTES` | Sant Boi / Plaça Espanya | Rutas FGC visibles. Formato `Origen|Destino;Origen|Destino`. |
 | `FGC_AMB_APP_ID` | `5b1fdf3a` | Identificador de la aplicación en la API TMB/AMB. |
 | `FGC_AMB_APP_KEY` | vacío | Clave privada de la API TMB/AMB. Guárdala solo en `.env`. |
 | `FGC_BUS_STOP_IDS` | vacío | Paradas AMB que se muestran en el panel, separadas por comas. Si queda vacío, no se muestran buses. |

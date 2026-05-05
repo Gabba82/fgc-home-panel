@@ -8,17 +8,19 @@ services:
     container_name: fgc-home-panel
     restart: unless-stopped
     environment:
-      FGC_TIMEZONE: ${FGC_TIMEZONE:-Europe/Madrid}
-      FGC_CACHE_TTL_SECONDS: ${FGC_CACHE_TTL_SECONDS:-30}
-      FGC_HTTP_TIMEOUT_SECONDS: ${FGC_HTTP_TIMEOUT_SECONDS:-8}
-      FGC_API_BASE_URL: ${FGC_API_BASE_URL:-https://dadesobertes.fgc.cat/api/explore/v2.1/catalog/datasets}
-      FGC_LOG_LEVEL: ${FGC_LOG_LEVEL:-INFO}
-      FGC_PANEL_TITLE: ${FGC_PANEL_TITLE:-Pròxims trens}
-      FGC_PANEL_SUBTITLE: ${FGC_PANEL_SUBTITLE:-}
-      FGC_BUS_STOP_IDS: ${FGC_BUS_STOP_IDS:-}
-      FGC_AMB_APP_ID: ${FGC_AMB_APP_ID:-5b1fdf3a}
-      FGC_AMB_APP_KEY: ${FGC_AMB_APP_KEY:-}
-      FGC_BUS_STOP_ID: ${FGC_BUS_STOP_ID:-}
+      FGC_TIMEZONE: "${FGC_TIMEZONE:-Europe/Madrid}"
+      FGC_CACHE_TTL_SECONDS: "${FGC_CACHE_TTL_SECONDS:-30}"
+      FGC_HTTP_TIMEOUT_SECONDS: "${FGC_HTTP_TIMEOUT_SECONDS:-8}"
+      FGC_API_BASE_URL: "${FGC_API_BASE_URL:-https://dadesobertes.fgc.cat/api/explore/v2.1/catalog/datasets}"
+      FGC_LOG_LEVEL: "${FGC_LOG_LEVEL:-INFO}"
+      FGC_PANEL_TITLE: "${FGC_PANEL_TITLE:-Pròxims trens}"
+      FGC_PANEL_SUBTITLE: "${FGC_PANEL_SUBTITLE:-}"
+      FGC_CARD_MIN_WIDTH_PX: "${FGC_CARD_MIN_WIDTH_PX:-280}"
+      FGC_TRAIN_ROUTES: "${FGC_TRAIN_ROUTES:-Sant Boi|Barcelona - Plaça Espanya;Barcelona - Plaça Espanya|Sant Boi}"
+      FGC_BUS_STOP_IDS: "${FGC_BUS_STOP_IDS:-}"
+      FGC_AMB_APP_ID: "${FGC_AMB_APP_ID:-5b1fdf3a}"
+      FGC_AMB_APP_KEY: "${FGC_AMB_APP_KEY:-}"
+      FGC_BUS_STOP_ID: "${FGC_BUS_STOP_ID:-}"
     ports:
       - "${WEBUI_PORT:-8099}:8000"
     healthcheck:
@@ -46,6 +48,14 @@ services:
           description:
             en_us: Optional panel subtitle
             es_es: Subtítulo opcional
+        - container: FGC_CARD_MIN_WIDTH_PX
+          description:
+            en_us: Minimum card width in pixels
+            es_es: Ancho mínimo de tarjeta en píxeles
+        - container: FGC_TRAIN_ROUTES
+          description:
+            en_us: FGC route pairs separated by semicolons
+            es_es: Pares de estaciones FGC separados por punto y coma
         - container: FGC_BUS_STOP_IDS
           description:
             en_us: AMB bus stop IDs, comma separated
@@ -67,7 +77,7 @@ x-casaos:
   hostname: ""
   icon: https://raw.githubusercontent.com/Gabba82/fgc-home-panel/main/docs/icon.svg
   index: /
-  port_map: ${WEBUI_PORT:-8099}
+  port_map: "${WEBUI_PORT:-8099}"
   scheme: http
   store_app_id: fgc-home-panel
   title:

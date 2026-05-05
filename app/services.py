@@ -13,21 +13,6 @@ from .models import Alert, NextTrainsResponse, RouteSense, Train
 
 logger = logging.getLogger(__name__)
 
-ROUTES = {
-    "santboi-espanya": RouteSense(
-        sense="santboi-espanya",
-        origin="Sant Boi",
-        destination="Barcelona - Plaça Espanya",
-        title="Sant Boi -> Plaça Espanya",
-    ),
-    "espanya-santboi": RouteSense(
-        sense="espanya-santboi",
-        origin="Barcelona - Plaça Espanya",
-        destination="Sant Boi",
-        title="Plaça Espanya -> Sant Boi",
-    ),
-}
-
 
 @dataclass
 class RealtimeStopUpdate:
@@ -99,19 +84,27 @@ def relevant_alert_text(alert: Alert) -> str:
     return normalize(" ".join(filter(None, [alert.title, alert.description])))
 
 
+def route_sense(origin: str, destination: str, index: int) -> str:
+    raw = f"{normalize(origin)}-{normalize(destination)}"
+    slug = "".join(ch if ch.isalnum() else "-" for ch in raw)
+    slug = "-".join(part for part in slug.split("-") if part)
+    return slug or f"route-{index + 1}"
+
+
 class FGCService:
     def __init__(self, client: FGCClient, settings: Settings):
         self.client = client
         self.settings = settings
+        self._routes = self._build_routes()
 
     def routes(self) -> list[RouteSense]:
-        return list(ROUTES.values())
+        return list(self._routes.values())
 
     async def next_trains(self, sense: str) -> NextTrainsResponse:
-        if sense not in ROUTES:
+        if sense not in self._routes:
             raise ValueError(f"Unknown sense: {sense}")
 
-        route = ROUTES[sense]
+        route = self._routes[sense]
         current = now_local(self.settings)
         origin_query = self._stop_query(route.origin)
         destination_query = self._stop_query(route.destination)
@@ -240,8 +233,22 @@ class FGCService:
             return {"available": False, "vehicles": 0}
         return {"available": True, "vehicles": sum(1 for entity in feed.entity if entity.HasField("vehicle"))}
 
+    def _build_routes(self) -> dict[str, RouteSense]:
+        routes = {}
+        for index, (origin, destination) in enumerate(self.settings.configured_train_routes):
+            sense = route_sense(origin, destination, index)
+            if sense in routes:
+                sense = f"{sense}-{index + 1}"
+            routes[sense] = RouteSense(
+                sense=sense,
+                origin=origin,
+                destination=destination,
+                title=f"{origin} -> {destination}",
+            )
+        return routes
+
     def _stop_query(self, stop_name: str) -> str:
-        if "Plaça Espanya" in stop_name:
+        if "placa espanya" in normalize(stop_name):
             return 'stop_name like "Espanya"'
         return f'stop_name like "{stop_name}"'
 
@@ -332,7 +339,10 @@ class FGCService:
         return [alert for alert in alerts if any(token and token in relevant_alert_text(alert) for token in haystack)]
 
     def _route_alerts(self, alerts: list[Alert]) -> list[Alert]:
-        tokens = ["llobregat", "anoia", "sant boi", "espanya", "placa espanya", "fgc"]
+        route_tokens = []
+        for route in self._routes.values():
+            route_tokens.extend([normalize(route.origin), normalize(route.destination)])
+        tokens = ["llobregat", "anoia", "fgc", *route_tokens]
         return [alert for alert in alerts if any(token in relevant_alert_text(alert) for token in tokens)]
 
     def _translated_text(self, translated_string: Any) -> str | None:

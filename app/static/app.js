@@ -1,4 +1,5 @@
-const senses = ["santboi-espanya", "espanya-santboi"];
+let senses = [];
+
 const cardsContainer = document.querySelector(".cards");
 const refreshButton = document.querySelector("#refresh");
 const globalError = document.querySelector("#global-error");
@@ -56,6 +57,48 @@ async function loadPanelConfig() {
     panelSubtitle.textContent = "";
     panelSubtitle.classList.add("hidden");
   }
+
+  if (config.card_min_width_px) {
+    document.documentElement.style.setProperty("--card-min-width", `${config.card_min_width_px}px`);
+  }
+}
+
+async function loadRoutes() {
+  const response = await fetch("/api/routes", {
+    headers: { Accept: "application/json" }
+  });
+  if (!response.ok) {
+    throw new Error(`No se han podido cargar las rutas FGC (${response.status})`);
+  }
+
+  const routes = await response.json();
+  senses = routes.map((route) => route.sense);
+  routes.forEach((route) => ensureRouteCard(route));
+}
+
+function ensureRouteCard(route) {
+  let card = document.querySelector(`[data-sense="${route.sense}"]`);
+  if (card) return card;
+
+  card = document.createElement("article");
+  card.className = "route-card";
+  card.dataset.sense = route.sense;
+  card.innerHTML = `
+    <div class="card-head">
+      <div>
+        <p class="direction"></p>
+        <h2></h2>
+      </div>
+      <div class="pulse" title="Actualización automática cada 30 segundos"></div>
+    </div>
+    <div class="meta">Carregant...</div>
+    <div class="alerts"></div>
+    <div class="trains"></div>
+  `;
+  card.querySelector(".direction").textContent = route.origin;
+  card.querySelector("h2").textContent = route.destination;
+  cardsContainer.appendChild(card);
+  return card;
 }
 
 function renderAlerts(container, alerts) {
@@ -128,6 +171,8 @@ function busElement(bus) {
 
 function renderCard(sense, data) {
   const card = document.querySelector(`[data-sense="${sense}"]`);
+  if (!card) return;
+
   const meta = card.querySelector(".meta");
   const alerts = card.querySelector(".alerts");
   const trains = card.querySelector(".trains");
@@ -241,6 +286,18 @@ async function refresh() {
   refreshButton.disabled = false;
 }
 
+async function boot() {
+  try {
+    await loadPanelConfig();
+    await loadRoutes();
+    await refresh();
+  } catch (error) {
+    globalError.textContent = error.message;
+    globalError.classList.remove("hidden");
+    refreshButton.disabled = false;
+  }
+}
+
 refreshButton.addEventListener("click", refresh);
 
 document.addEventListener("keydown", (event) => {
@@ -249,6 +306,5 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
-refresh();
-loadPanelConfig();
+boot();
 setInterval(refresh, 30000);
