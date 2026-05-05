@@ -22,6 +22,7 @@ class Settings(BaseSettings):
     trains_limit: int = Field(default=5, ge=1, le=10)
     source_records_limit: int = Field(default=500, ge=50, le=1000)
     bus_stop_id: str = "107214"
+    bus_stop_ids: str | None = None
     bus_stop_url: str = "https://www.ambmobilitat.cat/Principales/DatosParada.aspx"
     amb_app_id: str = "5b1fdf3a"
     amb_app_key: str | None = None
@@ -31,6 +32,12 @@ class Settings(BaseSettings):
     @property
     def tzinfo(self) -> ZoneInfo:
         return ZoneInfo(self.timezone)
+
+    @property
+    def configured_bus_stop_ids(self) -> list[str]:
+        value = self.bus_stop_ids or self.bus_stop_id
+        stop_ids = [stop_id.strip() for stop_id in value.split(",") if stop_id.strip()]
+        return stop_ids or [self.bus_stop_id]
 
 
 @lru_cache

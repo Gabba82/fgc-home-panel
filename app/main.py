@@ -88,6 +88,25 @@ async def bus_stop(stop_id: str = Query(default=settings.bus_stop_id, pattern=r"
         raise HTTPException(status_code=503, detail="No se han podido consultar los autobuses de AMB") from exc
 
 
+@app.get("/api/bus-stops", response_model=list[BusStopResponse])
+async def bus_stops() -> list[BusStopResponse]:
+    results = []
+    for stop_id in settings.configured_bus_stop_ids:
+        try:
+            results.append(await app.state.amb_client.stop_arrivals(stop_id))
+        except Exception as exc:
+            logger.warning("Could not read AMB bus stop %s: %s", stop_id, exc)
+            results.append(
+                BusStopResponse(
+                    stop_id=stop_id,
+                    stop_name=None,
+                    updated_at=now_local(settings).isoformat(),
+                    arrivals=[],
+                )
+            )
+    return results
+
+
 @app.get("/api/health", response_model=HealthResponse)
 async def health() -> HealthResponse:
     current = now_local(settings).isoformat()

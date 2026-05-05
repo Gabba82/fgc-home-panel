@@ -1,4 +1,5 @@
 const senses = ["santboi-espanya", "espanya-santboi"];
+const cardsContainer = document.querySelector(".cards");
 const refreshButton = document.querySelector("#refresh");
 const globalError = document.querySelector("#global-error");
 
@@ -120,8 +121,30 @@ function renderCard(sense, data) {
   data.trains.forEach((train) => trains.appendChild(trainElement(train)));
 }
 
+function ensureBusCard(stopId) {
+  let card = document.querySelector(`[data-bus-stop="${stopId}"]`);
+  if (card) return card;
+
+  card = document.createElement("article");
+  card.className = "route-card bus-card";
+  card.dataset.busStop = stopId;
+  card.innerHTML = `
+    <div class="card-head">
+      <div>
+        <p class="direction">Parada ${stopId}</p>
+        <h2>Bus AMB</h2>
+      </div>
+      <div class="pulse" title="Actualización automática cada 30 segundos"></div>
+    </div>
+    <div class="meta">Carregant...</div>
+    <div class="trains bus-arrivals"></div>
+  `;
+  cardsContainer.appendChild(card);
+  return card;
+}
+
 function renderBusStop(data) {
-  const card = document.querySelector(`[data-bus-stop="${data.stop_id}"]`);
+  const card = ensureBusCard(data.stop_id);
   const direction = card.querySelector(".direction");
   const meta = card.querySelector(".meta");
   const arrivals = card.querySelector(".bus-arrivals");
@@ -141,20 +164,6 @@ function renderBusStop(data) {
   data.arrivals.forEach((bus) => arrivals.appendChild(busElement(bus)));
 }
 
-function renderBusError(message) {
-  const card = document.querySelector("[data-bus-stop]");
-  const meta = card.querySelector(".meta");
-  const arrivals = card.querySelector(".bus-arrivals");
-
-  meta.textContent = `No se han podido actualizar los buses · ${formatUpdatedAt(new Date().toISOString())}`;
-  arrivals.innerHTML = "";
-
-  const empty = document.createElement("div");
-  empty.className = "empty";
-  empty.textContent = message || "AMB no responde ahora mismo.";
-  arrivals.appendChild(empty);
-}
-
 async function loadSense(sense) {
   const response = await fetch(`/api/next-trains?sense=${encodeURIComponent(sense)}`, {
     headers: { Accept: "application/json" }
@@ -165,8 +174,8 @@ async function loadSense(sense) {
   return response.json();
 }
 
-async function loadBusStop() {
-  const response = await fetch("/api/bus-stop", {
+async function loadBusStops() {
+  const response = await fetch("/api/bus-stops", {
     headers: { Accept: "application/json" }
   });
   if (!response.ok) {
@@ -178,15 +187,16 @@ async function loadBusStop() {
 async function refresh() {
   refreshButton.disabled = true;
   globalError.classList.add("hidden");
-  const [busStopResult, ...trainResults] = await Promise.allSettled([
-    loadBusStop(),
+  const [busStopsResult, ...trainResults] = await Promise.allSettled([
+    loadBusStops(),
     ...senses.map((sense) => loadSense(sense))
   ]);
 
-  if (busStopResult.status === "fulfilled") {
-    renderBusStop(busStopResult.value);
+  if (busStopsResult.status === "fulfilled") {
+    busStopsResult.value.forEach((busStop) => renderBusStop(busStop));
   } else {
-    renderBusError(busStopResult.reason?.message);
+    globalError.textContent = `No se han podido actualizar los buses. ${busStopsResult.reason?.message || ""}`;
+    globalError.classList.remove("hidden");
   }
 
   const failedTrains = [];
